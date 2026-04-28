@@ -1273,15 +1273,8 @@ std::wstring NppParameters::getSpecialFolderLocation(int folderKind)
 
 std::wstring NppParameters::getSettingsFolder() const
 {
-	if (_isLocal)
-		return _nppPath;
-
-	std::wstring settingsFolderPath = getSpecialFolderLocation(CSIDL_APPDATA);
-
-	if (settingsFolderPath.empty())
-		return _nppPath;
-
-	pathAppend(settingsFolderPath, L"Notepad++");
+	std::wstring settingsFolderPath = _nppPath;
+	pathAppend(settingsFolderPath, L"AppData");
 	return settingsFolderPath;
 }
 
@@ -1320,37 +1313,21 @@ bool NppParameters::load()
 	_pluginRootDir = _nppPath;
 	pathAppend(_pluginRootDir, L"plugins");
 
-	//
-	// the 3rd priority: general default configuration
-	//
+	// Force all user data into "<npp.exe directory>\\AppData"
 	std::wstring nppPluginRootParent;
-	if (_isLocal)
-	{
-		_userPath = nppPluginRootParent = _nppPath;
-		_userPluginConfDir = _pluginRootDir;
-		pathAppend(_userPluginConfDir, L"Config");
-	}
-	else
-	{
-		_userPath = getSpecialFolderLocation(CSIDL_APPDATA);
+	_userPath = _nppPath;
+	pathAppend(_userPath, L"AppData");
+	if (!doesDirectoryExist(_userPath.c_str()))
+		::CreateDirectory(_userPath.c_str(), NULL);
 
-		pathAppend(_userPath, L"Notepad++");
-		if (!doesDirectoryExist(_userPath.c_str()))
-			::CreateDirectory(_userPath.c_str(), NULL);
+	_appdataNppDir = _userPluginConfDir = _userPath;
+	pathAppend(_userPluginConfDir, L"plugins");
+	if (!doesDirectoryExist(_userPluginConfDir.c_str()))
+		::CreateDirectory(_userPluginConfDir.c_str(), NULL);
 
-		_appdataNppDir = _userPluginConfDir = _userPath;
-
-		pathAppend(_userPluginConfDir, L"plugins");
-		if (!doesDirectoryExist(_userPluginConfDir.c_str()))
-			::CreateDirectory(_userPluginConfDir.c_str(), NULL);
-
-		pathAppend(_userPluginConfDir, L"Config");
-		if (!doesDirectoryExist(_userPluginConfDir.c_str()))
-			::CreateDirectory(_userPluginConfDir.c_str(), NULL);
-
-		// For PluginAdmin to launch the wingup with UAC
-		setElevationRequired(true);
-	}
+	pathAppend(_userPluginConfDir, L"Config");
+	if (!doesDirectoryExist(_userPluginConfDir.c_str()))
+		::CreateDirectory(_userPluginConfDir.c_str(), NULL);
 
 	_pluginConfDir = _pluginRootDir; // for plugin list home
 	pathAppend(_pluginConfDir, L"Config");
@@ -1362,57 +1339,10 @@ bool NppParameters::load()
 
 	_sessionPath = _userPath; // Session stores the absolute file path, it should never be on cloud
 
-	// Detection cloud settings
-	std::wstring cloudChoicePath{_userPath};
-	cloudChoicePath += L"\\cloud\\choice";
-
-	//
-	// the 2nd priority: Cloud Choice Path
-	//
-	_isCloud = doesFileExist(cloudChoicePath.c_str());
-	if (_isCloud)
-	{
-		// Read cloud choice
-		std::wstring cloudChoiceStrW = L"";
-		bool bLoadingFailed = false;
-		std::string cloudChoiceStr = getFileContent(cloudChoicePath.c_str(), &bLoadingFailed);
-		if (!bLoadingFailed)
-		{
-			WcharMbcsConvertor& wmc = WcharMbcsConvertor::getInstance();
-			cloudChoiceStrW = wmc.char2wchar(cloudChoiceStr.c_str(), SC_CP_UTF8);
-		}
-		if (!cloudChoiceStrW.empty() && doesDirectoryExist(cloudChoiceStrW.c_str()))
-		{
-			_userPath = cloudChoiceStrW;
-			_nppGUI._cloudPath = cloudChoiceStrW;
-			_initialCloudChoice = _nppGUI._cloudPath;
-		}
-		else
-		{
-			_isCloud = false;
-		}
-	}
-
-	//
-	// the 1st priority: custom settings dir via command line argument
-	//
-	if (!_cmdSettingsDir.empty())
-	{
-		if (!doesDirectoryExist(_cmdSettingsDir.c_str()))
-		{
-			// The following text is not translatable.
-			// _pNativeLangSpeaker is initialized AFTER _userPath being determined because nativeLang.xml is from _userPath.
-			std::wstring errMsg = L"The given path\r";
-			errMsg += _cmdSettingsDir;
-			errMsg += L"\nvia command line \"-settingsDir=\" is not a valid directory.\rThis argument will be ignored.";
-			::MessageBox(NULL, errMsg.c_str(), L"Invalid directory", MB_OK);
-		}
-		else
-		{
-			_userPath = _cmdSettingsDir;
-			_sessionPath = _userPath; // reset session path
-		}
-	}
+	// Disable cloud/settingsDir overrides to keep a single fixed user data root.
+	_isCloud = false;
+	_nppGUI._cloudPath.clear();
+	_initialCloudChoice.clear();
 
 	//--------------------------//
 	// langs.xml : for per-user //

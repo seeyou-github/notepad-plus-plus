@@ -46,7 +46,6 @@ jobs:
 
         if (Test-Path $dst) { Remove-Item -LiteralPath $dst -Recurse -Force }
 
-        New-Item -ItemType Directory -Path "$dst\\updater" -Force | Out-Null
         New-Item -ItemType Directory -Path "$dst\\localization" -Force | Out-Null
         New-Item -ItemType Directory -Path "$dst\\themes" -Force | Out-Null
         New-Item -ItemType Directory -Path "$dst\\autoCompletion" -Force | Out-Null
@@ -58,14 +57,10 @@ jobs:
         New-Item -ItemType Directory -Path "$dst\\plugins\\Config" -Force | Out-Null
         New-Item -ItemType Directory -Path "$dst\\plugins\\doc" -Force | Out-Null
 
-        Copy-Item -LiteralPath "LICENSE" -Destination "$dst\\license.txt" -Force
-        Copy-Item -LiteralPath "$root\\bin\\readme.txt" -Destination $dst -Force
-        Copy-Item -LiteralPath "$root\\bin\\change.log" -Destination $dst -Force
         Copy-Item -LiteralPath "$root\\src\\langs.model.xml" -Destination $dst -Force
         Copy-Item -LiteralPath "$root\\src\\stylers.model.xml" -Destination $dst -Force
         Copy-Item -LiteralPath "$root\\src\\tabContextMenu_example.xml" -Destination $dst -Force
         Copy-Item -LiteralPath "$root\\src\\toolbarButtonsConf_example.xml" -Destination $dst -Force
-        Copy-Item -LiteralPath "$root\\installer\\xml4Config\\doLocalConf.xml" -Destination $dst -Force
         Copy-Item -LiteralPath "$root\\bin64\\notepad++.exe" -Destination $dst -Force
 
         Copy-IfExists -Source "$root\\bin64\\plugins\\NppExport\\NppExport.dll" -Destination "$dst\\plugins\\NppExport\\"
@@ -73,19 +68,13 @@ jobs:
         Copy-IfExists -Source "$root\\bin64\\plugins\\NppConverter\\NppConverter.dll" -Destination "$dst\\plugins\\NppConverter\\"
         Copy-IfExists -Source "$root\\bin64\\plugins\\Config\\nppPluginList.dll" -Destination "$dst\\plugins\\Config\\"
 
-        Copy-Item -Path "$root\\installer\\nativeLang\\*.xml" -Destination "$dst\\localization\\" -Force
+        Copy-Item -LiteralPath "$root\\installer\\nativeLang\\chineseSimplified.xml" -Destination "$dst\\localization\\" -Force
+        Copy-Item -LiteralPath "$root\\installer\\nativeLang\\chineseSimplified.xml" -Destination "$dst\\nativeLang.xml" -Force
         Copy-Item -Path "$root\\installer\\APIs\\*.xml" -Destination "$dst\\autoCompletion\\" -Force
         Copy-Item -Path "$root\\installer\\functionList\\*.xml" -Destination "$dst\\functionList\\" -Force
         Copy-Item -Path "$root\\installer\\themes\\*.xml" -Destination "$dst\\themes\\" -Force
         Copy-Item -LiteralPath "$root\\bin\\userDefineLangs\\markdown._preinstalled.udl.xml" -Destination "$dst\\userDefineLangs\\" -Force
         Copy-Item -LiteralPath "$root\\bin\\userDefineLangs\\markdown._preinstalled_DM.udl.xml" -Destination "$dst\\userDefineLangs\\" -Force
-
-        Copy-Item -LiteralPath "$root\\installer\\xml4Config\\disableNppAutoUpdate.xml" -Destination $dst -Force
-        Copy-IfExists -Source "$root\\bin64\\updater\\GUP.exe" -Destination "$dst\\updater\\"
-        Copy-IfExists -Source "$root\\bin64\\updater\\gup.xml" -Destination "$dst\\updater\\"
-        Copy-IfExists -Source "$root\\bin64\\updater\\LICENSE" -Destination "$dst\\updater\\"
-        Copy-IfExists -Source "$root\\bin64\\updater\\README.md" -Destination "$dst\\updater\\"
-        Copy-IfExists -Source "$root\\bin64\\updater\\updater.ico" -Destination "$dst\\updater\\"
 
     - name: Create portable x64 zip
       shell: pwsh

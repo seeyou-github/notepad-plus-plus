@@ -672,10 +672,10 @@ struct AdvOptDefaults final
 
 struct AdvancedOptions final
 {
-	AdvOptDefaults _darkDefaults{ L"DarkModeDefault.xml", { toolBarStatusType::TB_SMALL, FluentColor::defaultColor, 0, false }, 2, false };
+	AdvOptDefaults _darkDefaults{ L"DansLeRuSH-Dark.xml", { toolBarStatusType::TB_SMALL, FluentColor::defaultColor, 0, false }, 2, false };
 	AdvOptDefaults _lightDefaults{ L"", { toolBarStatusType::TB_STANDARD, FluentColor::defaultColor, 0, false }, 0, true };
 
-	bool _enableWindowsMode = false;
+	bool _enableWindowsMode = true;
 };
 
 struct DarkModeConf final
@@ -880,7 +880,7 @@ struct ScintillaViewParams
 {
 	bool _lineNumberMarginShow = true;
 	bool _lineNumberMarginDynamicWidth = true;
-	bool _bookMarkMarginShow = true;
+	bool _bookMarkMarginShow = false;
 	
 	bool _isChangeHistoryMarginEnabled = true;
 	bool _isChangeHistoryIndicatorEnabled = false;
@@ -911,17 +911,17 @@ struct ScintillaViewParams
 	bool _ccUniEolShow = true;
 	bool _npcNoInputC0 = true;
 
-	int _borderWidth = 2;
+	int _borderWidth = 0;
 	bool _virtualSpace = false;
 	bool _scrollBeyondLastLine = true;
 	bool _rightClickKeepsSelection = false;
 	bool _selectedTextForegroundSingleColor = false;
 	bool _disableAdvancedScrolling = false;
 	bool _doSmoothFont = false;
-	bool _showBorderEdge = true;
+	bool _showBorderEdge = false;
 
-	unsigned char _paddingLeft = 0;  // 0-9 pixel
-	unsigned char _paddingRight = 0; // 0-9 pixel
+	unsigned char _paddingLeft = 3;  // 0-9 pixel
+	unsigned char _paddingRight = 3; // 0-9 pixel
 
 	// distractionFreeDivPart is used for dividing the fullscreen pixel width.
 	// the result of division will be the left & right padding in Distraction Free mode

@@ -5434,6 +5434,7 @@ void NppParameters::feedGUIParameters(const NppXml::Element& element)
 				}
 
 			}
+			_nppGUI._menuIconSize = static_cast<int>(_nppGUI._tbIconInfo._tbIconSet);
 		}
 		// <GUIConfig name="StatusBar">show</GUIConfig>
 		else if (std::strcmp(nm, "StatusBar") == 0)
@@ -5444,6 +5445,9 @@ void NppParameters::feedGUIParameters(const NppXml::Element& element)
 		else if (std::strcmp(nm, "MenuBar") == 0)
 		{
 			_nppGUI._menuBarShow = getBoolChildTextNode(childNode, _nppGUI._menuBarShow, STR_BOOL_SHOWHIDE);
+			_nppGUI._menuIconSize = std::clamp(NppXml::intAttribute(childNode, "iconSize", _nppGUI._menuIconSize), 0, 4);
+			_nppGUI._menuBarFontSize = std::clamp(NppXml::intAttribute(childNode, "menuBarFontSize", _nppGUI._menuBarFontSize), 0, 72);
+			_nppGUI._menuListFontSize = std::clamp(NppXml::intAttribute(childNode, "menuListFontSize", _nppGUI._menuListFontSize), 0, 72);
 		}
 		// <GUIConfig name="TabBar" dragAndDrop="yes" drawTopBar="yes" drawInactiveTab="yes" reduce="yes" closeButton="yes"
 		// pinButton="yes" showOnlyPinnedButton="no" buttonsOninactiveTabs="no" doubleClick2Close="no"
@@ -7368,6 +7372,9 @@ void NppParameters::createXmlTreeFromGUIParams()
 	{
 		NppXml::Element GUIConfigElement = NppXml::createChildElement(newGUIRoot, "GUIConfig");
 		NppXml::setAttribute(GUIConfigElement, "name", "MenuBar");
+		NppXml::setAttribute(GUIConfigElement, "iconSize", _nppGUI._menuIconSize);
+		NppXml::setAttribute(GUIConfigElement, "menuBarFontSize", _nppGUI._menuBarFontSize);
+		NppXml::setAttribute(GUIConfigElement, "menuListFontSize", _nppGUI._menuListFontSize);
 		NppXml::createChildText(GUIConfigElement, _nppGUI._menuBarShow ? "show" : "hide");
 	}
 

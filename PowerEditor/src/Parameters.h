@@ -709,6 +709,9 @@ struct NppGUI final
 	bool _toolbarShow = true;
 	bool _statusBarShow = true;
 	bool _menuBarShow = true;
+	int _menuIconSize = 4; // 0..4 -> TB_SMALL..TB_STANDARD
+	int _menuBarFontSize = 0; // 0 means follow system
+	int _menuListFontSize = 0; // 0 means follow system
 
 	int _tabStatus = (TAB_DRAWTOPBAR | TAB_DRAWINACTIVETAB | TAB_DRAGNDROP | TAB_REDUCE | TAB_CLOSEBUTTON | TAB_PINBUTTON);
 	bool _forceTabbarVisible = false;

@@ -1,0 +1,92 @@
+name: Manual Build Windows x64 Portable Zip
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_windows_x64_portable_zip:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v6
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v3
+
+    - name: Modify resource.h N++ version to avoid confusion
+      working-directory: PowerEditor\src\
+      run: |
+        $content = Get-Content -Path 'resource.h'
+        $newContent = $content -replace 'TEXT\(\"Notepad\+\+ v.*\"\)', 'TEXT("Notepad++ GH_BUILD")'
+        $newContent | Set-Content -Path 'resource.h'
+
+    - name: MSBuild of n++ exe (Release/x64)
+      working-directory: PowerEditor\visual.net\
+      run: msbuild notepadPlus.sln /m /p:configuration="Release" /p:platform="x64" /p:PlatformToolset="v143"
+
+    - name: Build portable x64 package structure
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = "Stop"
+        $root = Join-Path $PWD "PowerEditor"
+        $dst = Join-Path $root "installer\\zipped.package.release64"
+
+        if (Test-Path $dst) { Remove-Item -LiteralPath $dst -Recurse -Force }
+
+        New-Item -ItemType Directory -Path "$dst\\updater" -Force | Out-Null
+        New-Item -ItemType Directory -Path "$dst\\localization" -Force | Out-Null
+        New-Item -ItemType Directory -Path "$dst\\themes" -Force | Out-Null
+        New-Item -ItemType Directory -Path "$dst\\autoCompletion" -Force | Out-Null
+        New-Item -ItemType Directory -Path "$dst\\functionList" -Force | Out-Null
+        New-Item -ItemType Directory -Path "$dst\\userDefineLangs" -Force | Out-Null
+        New-Item -ItemType Directory -Path "$dst\\plugins\\NppExport" -Force | Out-Null
+        New-Item -ItemType Directory -Path "$dst\\plugins\\mimeTools" -Force | Out-Null
+        New-Item -ItemType Directory -Path "$dst\\plugins\\NppConverter" -Force | Out-Null
+        New-Item -ItemType Directory -Path "$dst\\plugins\\Config" -Force | Out-Null
+        New-Item -ItemType Directory -Path "$dst\\plugins\\doc" -Force | Out-Null
+
+        Copy-Item -LiteralPath "LICENSE" -Destination "$dst\\license.txt" -Force
+        Copy-Item -LiteralPath "$root\\bin\\readme.txt" -Destination $dst -Force
+        Copy-Item -LiteralPath "$root\\bin\\change.log" -Destination $dst -Force
+        Copy-Item -LiteralPath "$root\\src\\langs.model.xml" -Destination $dst -Force
+        Copy-Item -LiteralPath "$root\\src\\stylers.model.xml" -Destination $dst -Force
+        Copy-Item -LiteralPath "$root\\src\\tabContextMenu_example.xml" -Destination $dst -Force
+        Copy-Item -LiteralPath "$root\\src\\toolbarButtonsConf_example.xml" -Destination $dst -Force
+        Copy-Item -LiteralPath "$root\\installer\\xml4Config\\doLocalConf.xml" -Destination $dst -Force
+        Copy-Item -LiteralPath "$root\\bin64\\notepad++.exe" -Destination $dst -Force
+
+        Copy-Item -LiteralPath "$root\\bin64\\plugins\\NppExport\\NppExport.dll" -Destination "$dst\\plugins\\NppExport\\" -Force
+        Copy-Item -LiteralPath "$root\\bin64\\plugins\\mimeTools\\mimeTools.dll" -Destination "$dst\\plugins\\mimeTools\\" -Force
+        Copy-Item -LiteralPath "$root\\bin64\\plugins\\NppConverter\\NppConverter.dll" -Destination "$dst\\plugins\\NppConverter\\" -Force
+        Copy-Item -LiteralPath "$root\\bin64\\plugins\\Config\\nppPluginList.dll" -Destination "$dst\\plugins\\Config\\" -Force
+
+        Copy-Item -Path "$root\\installer\\nativeLang\\*.xml" -Destination "$dst\\localization\\" -Force
+        Copy-Item -Path "$root\\installer\\APIs\\*.xml" -Destination "$dst\\autoCompletion\\" -Force
+        Copy-Item -Path "$root\\installer\\functionList\\*.xml" -Destination "$dst\\functionList\\" -Force
+        Copy-Item -Path "$root\\installer\\themes\\*.xml" -Destination "$dst\\themes\\" -Force
+        Copy-Item -LiteralPath "$root\\bin\\userDefineLangs\\markdown._preinstalled.udl.xml" -Destination "$dst\\userDefineLangs\\" -Force
+        Copy-Item -LiteralPath "$root\\bin\\userDefineLangs\\markdown._preinstalled_DM.udl.xml" -Destination "$dst\\userDefineLangs\\" -Force
+
+        Copy-Item -LiteralPath "$root\\installer\\xml4Config\\disableNppAutoUpdate.xml" -Destination $dst -Force
+        Copy-Item -LiteralPath "$root\\bin64\\updater\\GUP.exe" -Destination "$dst\\updater\\" -Force
+        Copy-Item -LiteralPath "$root\\bin64\\updater\\gup.xml" -Destination "$dst\\updater\\" -Force
+        Copy-Item -LiteralPath "$root\\bin64\\updater\\LICENSE" -Destination "$dst\\updater\\" -Force
+        Copy-Item -LiteralPath "$root\\bin64\\updater\\README.md" -Destination "$dst\\updater\\" -Force
+        Copy-Item -LiteralPath "$root\\bin64\\updater\\updater.ico" -Destination "$dst\\updater\\" -Force
+
+    - name: Create portable x64 zip
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = "Stop"
+        $src = "PowerEditor\\installer\\zipped.package.release64\\*"
+        $zip = "PowerEditor\\installer\\build\\npp.portable.x64.zip"
+        New-Item -ItemType Directory -Path "PowerEditor\\installer\\build" -Force | Out-Null
+        if (Test-Path $zip) { Remove-Item -LiteralPath $zip -Force }
+        Compress-Archive -Path $src -DestinationPath $zip -CompressionLevel Optimal
+
+    - name: Upload portable x64 zip artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: npp.portable.x64.zip
+        path: PowerEditor\installer\build\npp.portable.x64.zip

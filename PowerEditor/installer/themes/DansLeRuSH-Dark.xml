@@ -1191,12 +1191,12 @@ Installation : Copy this file to "%APPDATA%\Notepad++\themes" and in a portable 
             <WordsStyle name="ERROR" styleID="8" fgColor="A88AB6" bgColor="2E2E2E" fontName="" fontStyle="0" fontSize="" />
         </LexerType>
         <LexerType name="searchResult" desc="Search result" ext="">
-            <WordsStyle name="Search Header" styleID="1" fgColor="000080" bgColor="BBBBFF" fontName="" fontStyle="1" fontSize="" />
-            <WordsStyle name="File Header" styleID="2" fgColor="666666" bgColor="D5FFD5" fontName="" fontStyle="1" fontSize="" />
-            <WordsStyle name="Line Number" styleID="3" fgColor="C7C7C7" bgColor="2E2E2E" fontName="" fontStyle="0" fontSize="" />
-            <WordsStyle name="Hit Word" styleID="4" fgColor="FF0000" bgColor="FFFFBF" fontName="" fontStyle="0" fontSize="" />
-            <WordsStyle name="Selected Line" styleID="5" fgColor="000080" bgColor="FFFF4F" fontName="" fontStyle="0" fontSize="">if else for while</WordsStyle>
-            <WordsStyle name="Current line background colour" styleID="6" bgColor="E8E8FF" fgColor="FF8000" fontSize="" fontStyle="0" />
+            <WordsStyle name="Search Header" styleID="1" fgColor="808000" bgColor="303030" fontName="" fontStyle="1" fontSize="" />
+            <WordsStyle name="File Header" styleID="2" fgColor="C0C0C0" bgColor="3D3D3D" fontName="" fontStyle="1" fontSize="" />
+            <WordsStyle name="Line Number" styleID="3" fgColor="808080" bgColor="363636" fontName="" fontStyle="0" fontSize="" />
+            <WordsStyle name="Hit Word" styleID="4" fgColor="808000" bgColor="2F2F2F" fontName="" fontStyle="0" fontSize="" />
+            <WordsStyle name="Selected Line" styleID="5" fgColor="000080" bgColor="808080" fontName="" fontStyle="0" fontSize="">if else for while</WordsStyle>
+            <WordsStyle name="Current line background colour" styleID="6" bgColor="3C3C3C" fgColor="000080" fontSize="" fontStyle="0" />
         </LexerType>
         <LexerType name="asn1" desc="ASN.1" ext="">
             <WordsStyle name="DEFAULT" styleID="0" fgColor="C7C7C7" bgColor="2E2E2E" fontName="" fontStyle="0" fontSize="" />
@@ -1822,7 +1822,7 @@ Installation : Copy this file to "%APPDATA%\Notepad++\themes" and in a portable 
         <WidgetStyle name="Bad brace colour" styleID="35" fgColor="A88AB6" bgColor="2E2E2E" fontName="" fontStyle="0" fontSize=""></WidgetStyle>
         <WidgetStyle name="Current line background colour" styleID="0" bgColor="363636"></WidgetStyle>
         <!-- In below rule 'fgColor' attribute for 'Selected text colour' can be unlocked with a enableSelectFgColor.xml file -->
-        <WidgetStyle name="Selected text colour" styleID="0" bgColor="4D4D4D" fgColor="C0C0C0"></WidgetStyle>
+        <WidgetStyle name="Selected text colour" styleID="0" bgColor="804000" fgColor="C0C0C0"></WidgetStyle>
         <WidgetStyle name="Multi-selected text color" styleID="0" bgColor="4D4D4D"></WidgetStyle>
         <WidgetStyle name="Caret colour" styleID="2069" fgColor="A7A7A7"></WidgetStyle>
         <WidgetStyle name="Multi-edit carets color" styleID="0" fgColor="A7A7A7"></WidgetStyle>
@@ -1838,7 +1838,7 @@ Installation : Copy this file to "%APPDATA%\Notepad++\themes" and in a portable 
         <WidgetStyle name="Fold active" styleID="0" fgColor="666666"></WidgetStyle>
         <WidgetStyle name="Fold margin" styleID="0" fgColor="2E2E2E" bgColor="2E2E2E"></WidgetStyle>
         <WidgetStyle name="White space symbol" styleID="0" fgColor="4D4D4D"></WidgetStyle>
-        <WidgetStyle name="Smart Highlighting" styleID="29" bgColor="2E2E2E"></WidgetStyle>
+        <WidgetStyle name="Smart Highlighting" styleID="29" bgColor="FF8000"></WidgetStyle>
         <WidgetStyle name="Find Mark Style" styleID="31" bgColor="2E2E2E"></WidgetStyle>
         <WidgetStyle name="Find status: Not found" styleID="0" fgColor="FF0000"></WidgetStyle>
         <WidgetStyle name="Find status: Message" styleID="0" fgColor="0000FF"></WidgetStyle>

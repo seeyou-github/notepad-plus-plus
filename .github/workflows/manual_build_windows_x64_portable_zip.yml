@@ -31,6 +31,18 @@ jobs:
         $ErrorActionPreference = "Stop"
         $root = Join-Path $PWD "PowerEditor"
         $dst = Join-Path $root "installer\\zipped.package.release64"
+        function Copy-IfExists {
+          param(
+            [Parameter(Mandatory = $true)][string]$Source,
+            [Parameter(Mandatory = $true)][string]$Destination
+          )
+          if (Test-Path -LiteralPath $Source) {
+            Copy-Item -LiteralPath $Source -Destination $Destination -Force
+          }
+          else {
+            Write-Host "Skip missing optional file: $Source"
+          }
+        }
 
         if (Test-Path $dst) { Remove-Item -LiteralPath $dst -Recurse -Force }
 
@@ -56,10 +68,10 @@ jobs:
         Copy-Item -LiteralPath "$root\\installer\\xml4Config\\doLocalConf.xml" -Destination $dst -Force
         Copy-Item -LiteralPath "$root\\bin64\\notepad++.exe" -Destination $dst -Force
 
-        Copy-Item -LiteralPath "$root\\bin64\\plugins\\NppExport\\NppExport.dll" -Destination "$dst\\plugins\\NppExport\\" -Force
-        Copy-Item -LiteralPath "$root\\bin64\\plugins\\mimeTools\\mimeTools.dll" -Destination "$dst\\plugins\\mimeTools\\" -Force
-        Copy-Item -LiteralPath "$root\\bin64\\plugins\\NppConverter\\NppConverter.dll" -Destination "$dst\\plugins\\NppConverter\\" -Force
-        Copy-Item -LiteralPath "$root\\bin64\\plugins\\Config\\nppPluginList.dll" -Destination "$dst\\plugins\\Config\\" -Force
+        Copy-IfExists -Source "$root\\bin64\\plugins\\NppExport\\NppExport.dll" -Destination "$dst\\plugins\\NppExport\\"
+        Copy-IfExists -Source "$root\\bin64\\plugins\\mimeTools\\mimeTools.dll" -Destination "$dst\\plugins\\mimeTools\\"
+        Copy-IfExists -Source "$root\\bin64\\plugins\\NppConverter\\NppConverter.dll" -Destination "$dst\\plugins\\NppConverter\\"
+        Copy-IfExists -Source "$root\\bin64\\plugins\\Config\\nppPluginList.dll" -Destination "$dst\\plugins\\Config\\"
 
         Copy-Item -Path "$root\\installer\\nativeLang\\*.xml" -Destination "$dst\\localization\\" -Force
         Copy-Item -Path "$root\\installer\\APIs\\*.xml" -Destination "$dst\\autoCompletion\\" -Force
@@ -69,11 +81,11 @@ jobs:
         Copy-Item -LiteralPath "$root\\bin\\userDefineLangs\\markdown._preinstalled_DM.udl.xml" -Destination "$dst\\userDefineLangs\\" -Force
 
         Copy-Item -LiteralPath "$root\\installer\\xml4Config\\disableNppAutoUpdate.xml" -Destination $dst -Force
-        Copy-Item -LiteralPath "$root\\bin64\\updater\\GUP.exe" -Destination "$dst\\updater\\" -Force
-        Copy-Item -LiteralPath "$root\\bin64\\updater\\gup.xml" -Destination "$dst\\updater\\" -Force
-        Copy-Item -LiteralPath "$root\\bin64\\updater\\LICENSE" -Destination "$dst\\updater\\" -Force
-        Copy-Item -LiteralPath "$root\\bin64\\updater\\README.md" -Destination "$dst\\updater\\" -Force
-        Copy-Item -LiteralPath "$root\\bin64\\updater\\updater.ico" -Destination "$dst\\updater\\" -Force
+        Copy-IfExists -Source "$root\\bin64\\updater\\GUP.exe" -Destination "$dst\\updater\\"
+        Copy-IfExists -Source "$root\\bin64\\updater\\gup.xml" -Destination "$dst\\updater\\"
+        Copy-IfExists -Source "$root\\bin64\\updater\\LICENSE" -Destination "$dst\\updater\\"
+        Copy-IfExists -Source "$root\\bin64\\updater\\README.md" -Destination "$dst\\updater\\"
+        Copy-IfExists -Source "$root\\bin64\\updater\\updater.ico" -Destination "$dst\\updater\\"
 
     - name: Create portable x64 zip
       shell: pwsh

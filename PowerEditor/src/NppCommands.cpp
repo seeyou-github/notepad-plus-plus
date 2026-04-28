@@ -793,44 +793,11 @@ void Notepad_plus::command(int id)
 
 		case IDM_EDIT_SEARCHONINTERNET:
 		{
-			if (_pEditView->execute(SCI_GETSELECTIONS) != 1) // Multi-Selection || Column mode || no selection
-				return;
-
-			const NppGUI & nppGui = (NppParameters::getInstance()).getNppGUI();
-			wstring url;
-			if (nppGui._searchEngineChoice == nppGui.se_custom)
-			{
-				url = nppGui._searchEngineCustom;
-				url.erase(std::remove_if(url.begin(), url.end(), [](_TUCHAR x) {return _istspace(x); }),
-					url.end());
-
-				auto httpPos = url.find(L"http://");
-				auto httpsPos = url.find(L"https://");
-
-				if (url.empty() || (httpPos != 0 && httpsPos != 0)) // if string is not a url (for launching only browser)
-				{
-					url = L"https://www.google.com/search?q=$(CURRENT_WORD)";
-				}
-			}
-			else if (nppGui._searchEngineChoice == nppGui.se_duckDuckGo || nppGui._searchEngineChoice == nppGui.se_bing)
-			{
-				url = L"https://duckduckgo.com/?q=$(CURRENT_WORD)";
-			}
-			else if (nppGui._searchEngineChoice == nppGui.se_google)
-			{
-				url = L"https://www.google.com/search?q=$(CURRENT_WORD)";
-			}
-			else if (nppGui._searchEngineChoice == nppGui.se_yahoo)
-			{
-				url = L"https://search.yahoo.com/search?q=$(CURRENT_WORD)";
-			}
-			else if (nppGui._searchEngineChoice == nppGui.se_stackoverflow)
-			{
-				url = L"https://stackoverflow.com/search?q=$(CURRENT_WORD)";
-			}
-
-			Command cmd(url.c_str());
-			cmd.run(_pPublicInterface->getHSelf());	
+			_nativeLangSpeaker.messageBox("NetworkDisabledSearch",
+				_pPublicInterface->getHSelf(),
+				L"Network search has been disabled by this build.",
+				L"Network Disabled",
+				MB_OK | MB_APPLMODAL);
 		}
 		break;
 
@@ -3689,18 +3656,30 @@ void Notepad_plus::command(int id)
 
 		case IDM_HOMESWEETHOME :
 		{
-			::ShellExecute(NULL, L"open", L"https://notepad-plus-plus.org/", NULL, NULL, SW_SHOWNORMAL);
+			_nativeLangSpeaker.messageBox("NetworkDisabledHomePage",
+				_pPublicInterface->getHSelf(),
+				L"Network access has been disabled by this build.",
+				L"Network Disabled",
+				MB_OK | MB_APPLMODAL);
 			break;
 		}
 		case IDM_PROJECTPAGE :
 		{
-			::ShellExecute(NULL, L"open", L"https://github.com/notepad-plus-plus/notepad-plus-plus/", NULL, NULL, SW_SHOWNORMAL);
+			_nativeLangSpeaker.messageBox("NetworkDisabledProjectPage",
+				_pPublicInterface->getHSelf(),
+				L"Network access has been disabled by this build.",
+				L"Network Disabled",
+				MB_OK | MB_APPLMODAL);
 			break;
 		}
 
 		case IDM_ONLINEDOCUMENT:
 		{
-			::ShellExecute(NULL, L"open", L"https://npp-user-manual.org/", NULL, NULL, SW_SHOWNORMAL);
+			_nativeLangSpeaker.messageBox("NetworkDisabledDoc",
+				_pPublicInterface->getHSelf(),
+				L"Network access has been disabled by this build.",
+				L"Network Disabled",
+				MB_OK | MB_APPLMODAL);
 			break;
 		}
 
@@ -3712,72 +3691,22 @@ void Notepad_plus::command(int id)
 
 		case IDM_FORUM:
 		{
-			::ShellExecute(NULL, L"open", L"https://community.notepad-plus-plus.org/", NULL, NULL, SW_SHOWNORMAL);
+			_nativeLangSpeaker.messageBox("NetworkDisabledForum",
+				_pPublicInterface->getHSelf(),
+				L"Network access has been disabled by this build.",
+				L"Network Disabled",
+				MB_OK | MB_APPLMODAL);
 			break;
 		}
 
 		case IDM_UPDATE_NPP :
 		case IDM_CONFUPDATERPROXY :
 		{
-			// wingup doesn't work with the obsolete security layer (API) under xp since downloads are secured with SSL on notepad_plus_plus.org
-			const NppParameters& nppParams = NppParameters::getInstance();
-			winVer ver = nppParams.getWinVersion();
-			if (ver <= WV_XP)
-			{
-				long res = _nativeLangSpeaker.messageBox("XpUpdaterProblem",
-					_pPublicInterface->getHSelf(),
-					L"Notepad++ updater is not compatible with XP due to the obsolete security layer under XP.\rDo you want to go to Notepad++ page to download the latest version?",
-					L"Notepad++ Updater",
-					MB_YESNO);
-
-				if (res == IDYES)
-				{
-					::ShellExecute(NULL, L"open", L"https://notepad-plus-plus.org/downloads/", NULL, NULL, SW_SHOWNORMAL);
-				}
-			}
-			else
-			{
-				wstring updaterDir = nppParams.getNppPath();
-				pathAppend(updaterDir, L"updater");
-
-				wstring updaterFullPath = updaterDir;
-				pathAppend(updaterFullPath, L"gup.exe");
-
-
-#if !defined(NDEBUG)  // if not debug, then it's release
-				bool isCertifVerified = true;
-#else //RELEASE
-				// check the signature on updater
-				SecurityGuard securityGuard;
-				bool isCertifVerified = securityGuard.checkModule(updaterFullPath, nm_gup);
-#endif
-				if (isCertifVerified)
-				{
-					wstring param;
-					if (id == IDM_CONFUPDATERPROXY)
-					{
-						if (!_isAdministrator)
-						{
-							_nativeLangSpeaker.messageBox("GUpProxyConfNeedAdminMode",
-								_pPublicInterface->getHSelf(),
-								L"Please relaunch Notepad++ in Admin mode to configure proxy.",
-								L"Proxy Settings",
-								MB_OK | MB_APPLMODAL);
-							return;
-						}
-						param = L"-options";
-					}
-					else
-					{	
-						nppParams.buildGupParams(param);
-
-						param += L" -verbose";
-					}
-					Process updater(updaterFullPath.c_str(), param.c_str(), updaterDir.c_str());
-
-					updater.run();
-				}
-			}
+			_nativeLangSpeaker.messageBox("UpdaterDisabled",
+				_pPublicInterface->getHSelf(),
+				L"Updater has been removed in this build.",
+				L"Updater Disabled",
+				MB_OK | MB_APPLMODAL);
 			break;
 		}
 
@@ -3938,7 +3867,11 @@ void Notepad_plus::command(int id)
 
 		case IDM_LANG_UDLCOLLECTION_PROJECT_SITE:
 		{
-			::ShellExecute(NULL, L"open", L"https://github.com/notepad-plus-plus/userDefinedLanguages", NULL, NULL, SW_SHOWNORMAL);
+			_nativeLangSpeaker.messageBox("NetworkDisabledUdlCollection",
+				_pPublicInterface->getHSelf(),
+				L"Network access has been disabled by this build.",
+				L"Network Disabled",
+				MB_OK | MB_APPLMODAL);
 			break;
 		}
 

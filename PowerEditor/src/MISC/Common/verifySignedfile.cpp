@@ -158,23 +158,8 @@ bool SecurityGuard::verifySignedBinary(const std::wstring& filepath)
 	}
 	else
 	{
-		// if offline, revocation is not checked
-		// depending on windows version, this may introduce a latency on offline systems
-		DWORD netstatus;
-		QOCINFO oci;
-		oci.dwSize = sizeof(oci);
-		CONST wchar_t* msftTEXTest_site = L"http://www.msftncsi.com/ncsi.txt";
-		bool online = false;
-		online = (0 != IsNetworkAlive(&netstatus));
-		online = online && (GetLastError() == 0);
-		online = online && (IsDestinationReachable(msftTEXTest_site, &oci) == 0);
-		if (!online)
-		{
-			winTEXTrust_data.fdwRevocationChecks = WTD_REVOKE_NONE;
-
-			if (doLogCertifError)
-				writeCertVerifLog(errorLogPath.c_str(), L"VerifyComponent: system is offline - certificate revocation won't be checked");
-		}
+		// Privacy hardening: avoid network reachability probing.
+		winTEXTrust_data.fdwRevocationChecks = WTD_REVOKE_NONE;
 	}
 
 	if (_doCheckChainOfTrust)

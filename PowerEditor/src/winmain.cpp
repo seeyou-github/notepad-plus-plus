@@ -379,26 +379,10 @@ void stripIgnoredParams(ParamVector & params)
 
 bool launchUpdater(const std::wstring& updaterFullPath, const std::wstring& updaterDir)
 {
-	NppParameters& nppParameters = NppParameters::getInstance();
-	NppGUI& nppGui = nppParameters.getNppGUI();
-
-	// check if update interval elapsed
-	Date today(0);
-	if (today < nppGui._autoUpdateOpt._nextUpdateDate)
-		return false;
-
-	std::wstring updaterParams;
-	nppParameters.buildGupParams(updaterParams);
-
-	Process updater(updaterFullPath.c_str(), updaterParams.c_str(), updaterDir.c_str());
-	updater.run();
-
-	// Update next update date
-	if (nppGui._autoUpdateOpt._intervalDays < 0) // Make sure interval days value is positive
-		nppGui._autoUpdateOpt._intervalDays = 0 - nppGui._autoUpdateOpt._intervalDays;
-	nppGui._autoUpdateOpt._nextUpdateDate = Date(nppGui._autoUpdateOpt._intervalDays);
-
-	return true;
+	(void)updaterFullPath;
+	(void)updaterDir;
+	// Privacy hardening: updater is disabled in this build.
+	return false;
 }
 
 DWORD nppUacSave(const wchar_t* wszTempFilePath, const wchar_t* wszProtectedFilePath2Save)
@@ -774,24 +758,13 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstance
 	auto upNotepadWindow = std::make_unique<Notepad_plus_Window>();
 	Notepad_plus_Window & notepad_plus_plus = *upNotepadWindow.get();
 
-	std::wstring updaterDir = nppParameters.getNppPath();
-	updaterDir += L"\\updater\\";
-
-	std::wstring updaterFullPath = updaterDir + L"gup.exe";
-
-	bool isUpExist = nppGui._doesExistUpdater = doesFileExist(updaterFullPath.c_str());
-
-	// wingup doesn't work with the obsolete security layer (API) under xp since downloads are secured with SSL on notepad-plus-plus.org
+	const std::wstring updaterDir;
+	const std::wstring updaterFullPath;
+	const bool isUpExist = false;
+	nppGui._doesExistUpdater = false;
 	winVer ver = nppParameters.getWinVersion();
-	bool isGtXP = ver > WV_XP;
-
-	SecurityGuard securityGuard;
-	bool isSignatureOK = securityGuard.checkModule(updaterFullPath, nm_gup);
-
-	if (TheFirstOne && isUpExist && isGtXP && isSignatureOK && doUpdateNpp && !updateAtExit && !nppParameters.isNppAutoUpdateDisabled())
-	{
-		launchUpdater(updaterFullPath, updaterDir);
-	}
+	const bool isGtXP = false;
+	const bool isSignatureOK = false;
 
 	MSG msg{};
 	msg.wParam = 0;

@@ -217,6 +217,21 @@ HINSTANCE Command::run(HWND hWnd, const wchar_t* cwd)
 
 	wchar_t cwd2Exec[MAX_PATH]{};
 	expandNppEnvironmentStrs(cwd, cwd2Exec, MAX_PATH, hWnd);
+
+	// Privacy hardening: block launching network URLs.
+	const wstring cmdToExec = cmd2Exec;
+	const wstring lowerCmd = stringToLower(cmdToExec);
+	const bool isNetworkTarget =
+		(lowerCmd.rfind(L"http://", 0) == 0) ||
+		(lowerCmd.rfind(L"https://", 0) == 0) ||
+		(lowerCmd.rfind(L"ftp://", 0) == 0) ||
+		(lowerCmd.rfind(L"ftps://", 0) == 0) ||
+		(lowerCmd.rfind(L"mailto:", 0) == 0);
+	if (isNetworkTarget)
+	{
+		::MessageBox(hWnd, L"Network access has been disabled by this build.", L"Network Disabled", MB_OK | MB_ICONINFORMATION);
+		return reinterpret_cast<HINSTANCE>(SE_ERR_ACCESSDENIED);
+	}
 	
 	HINSTANCE res = ::ShellExecute(hWnd, L"open", cmd2Exec, args2Exec, cwd2Exec, SW_SHOW);
 

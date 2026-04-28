@@ -100,17 +100,7 @@ void URLCtrl::action()
 		::InvalidateRect(_hSelf, 0, 0);
 		::UpdateWindow(_hSelf);
 
-		// Open a browser
-		if (!_URL.empty())
-		{
-			::ShellExecute(NULL, L"open", _URL.c_str(), NULL, NULL, SW_SHOWNORMAL);
-		}
-		else
-		{
-			wchar_t szWinText[MAX_PATH] = { '\0' };
-			::GetWindowText(_hSelf, szWinText, MAX_PATH);
-			::ShellExecute(NULL, L"open", szWinText, NULL, NULL, SW_SHOWNORMAL);
-		}
+		::MessageBox(_hSelf, L"Network access has been disabled by this build.", L"Network Disabled", MB_OK | MB_ICONINFORMATION);
 	}
 }
 

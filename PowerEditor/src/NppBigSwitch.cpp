@@ -2795,12 +2795,7 @@ LRESULT Notepad_plus::process(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
 
 				if (!nppParam.isEndSessionCritical())
 				{
-					wstring updaterFullPath = nppParam.getWingupFullPath();
-					if (!updaterFullPath.empty())
-					{
-						Process updater(updaterFullPath.c_str(), nppParam.getWingupParams().c_str(), nppParam.getWingupDir().c_str());
-						updater.run(nppParam.shouldDoUAC());
-					}
+					// Privacy hardening: external updater execution is disabled.
 				}
 			}
 

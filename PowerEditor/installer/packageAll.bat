@@ -31,7 +31,7 @@ REM files to be signed
 
 set nppBinaries=..\bin\notepad++.exe ..\bin64\notepad++.exe ..\binarm64\notepad++.exe
 
-set componentsBinaries=..\bin\plugins\Config\nppPluginList.dll ..\bin64\plugins\Config\nppPluginList.dll ..\binarm64\plugins\Config\nppPluginList.dll ..\bin\updater\GUP.exe ..\bin64\updater\GUP.exe ..\binarm64\updater\GUP.exe
+set componentsBinaries=..\bin\plugins\Config\nppPluginList.dll ..\bin64\plugins\Config\nppPluginList.dll ..\binarm64\plugins\Config\nppPluginList.dll
 
 set pluginBinaries=..\bin\plugins\NppExport\NppExport.dll ..\bin64\plugins\NppExport\NppExport.dll ..\binarm64\plugins\NppExport\NppExport.dll ..\bin\plugins\mimeTools\mimeTools.dll ..\bin64\plugins\mimeTools\mimeTools.dll ..\binarm64\plugins\mimeTools\mimeTools.dll ..\bin\plugins\NppConverter\NppConverter.dll ..\bin64\plugins\NppConverter\NppConverter.dll ..\binarm64\plugins\NppConverter\NppConverter.dll
 
@@ -335,52 +335,22 @@ If ErrorLevel 1 goto End
 copy /Y ".\themes\*.xml" .\zipped.package.releaseArm64\themes\
 If ErrorLevel 1 goto End
 
-rem Use Plugins Admin but disable auto-update for x86 portable package
+rem Use Plugins Admin and keep updater payload removed for privacy build
 copy /Y .\xml4Config\disableNppAutoUpdate.xml .\zipped.package.release\
 If ErrorLevel 1 goto End
 copy /Y ..\bin\plugins\Config\nppPluginList.dll .\zipped.package.release\plugins\Config\
 If ErrorLevel 1 goto End
-copy /Y ..\bin\updater\GUP.exe .\zipped.package.release\updater\
-If ErrorLevel 1 goto End
-copy /Y ..\bin\updater\gup.xml .\zipped.package.release\updater\
-If ErrorLevel 1 goto End
-copy /Y ..\bin\updater\LICENSE .\zipped.package.release\updater\
-If ErrorLevel 1 goto End
-copy /Y ..\bin\updater\README.md .\zipped.package.release\updater\
-If ErrorLevel 1 goto End
-copy /Y ..\bin\updater\updater.ico .\zipped.package.release\updater\
-If ErrorLevel 1 goto End
 
-rem Use Plugins Admin but disable auto-update for x64 portable package
+rem Use Plugins Admin and keep updater payload removed for privacy build
 copy /Y .\xml4Config\disableNppAutoUpdate.xml .\zipped.package.release64\
 If ErrorLevel 1 goto End
 copy /Y ..\bin64\plugins\Config\nppPluginList.dll .\zipped.package.release64\plugins\Config\
 If ErrorLevel 1 goto End
-copy /Y ..\bin64\updater\GUP.exe .\zipped.package.release64\updater\
-If ErrorLevel 1 goto End
-copy /Y ..\bin64\updater\gup.xml .\zipped.package.release64\updater\
-If ErrorLevel 1 goto End
-copy /Y ..\bin64\updater\LICENSE .\zipped.package.release64\updater\
-If ErrorLevel 1 goto End
-copy /Y ..\bin64\updater\README.md .\zipped.package.release64\updater\
-If ErrorLevel 1 goto End
-copy /Y ..\bin64\updater\updater.ico .\zipped.package.release64\updater\
-If ErrorLevel 1 goto End
 
-rem Use Plugins Admin but disable auto-update for ARM64 portable package
+rem Use Plugins Admin and keep updater payload removed for privacy build
 copy /Y .\xml4Config\disableNppAutoUpdate.xml .\zipped.package.releaseArm64\
 If ErrorLevel 1 goto End
 copy /Y ..\binarm64\plugins\Config\nppPluginList.dll .\zipped.package.releaseArm64\plugins\Config\
-If ErrorLevel 1 goto End
-copy /Y ..\binarm64\updater\GUP.exe .\zipped.package.releaseArm64\updater\
-If ErrorLevel 1 goto End
-copy /Y ..\binarm64\updater\gup.xml .\zipped.package.releaseArm64\updater\
-If ErrorLevel 1 goto End
-copy /Y ..\binarm64\updater\LICENSE .\zipped.package.releaseArm64\updater\
-If ErrorLevel 1 goto End
-copy /Y ..\binarm64\updater\README.md .\zipped.package.releaseArm64\updater\
-If ErrorLevel 1 goto End
-copy /Y ..\binarm64\updater\updater.ico .\zipped.package.releaseArm64\updater\
 If ErrorLevel 1 goto End
 
 

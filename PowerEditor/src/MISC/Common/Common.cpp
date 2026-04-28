@@ -174,32 +174,9 @@ void writeFileContent(const wchar_t *file2write, const char *content2write)
 
 void writeLog(const wchar_t* logFileName, const char* log2write)
 {
-	const DWORD accessParam{ GENERIC_READ | GENERIC_WRITE };
-	const DWORD shareParam{ FILE_SHARE_READ | FILE_SHARE_WRITE };
-	const DWORD dispParam{ OPEN_ALWAYS }; // Open existing file for writing without destroying it or create new
-	const DWORD attribParam{ FILE_ATTRIBUTE_NORMAL };
-	HANDLE hFile = ::CreateFileW(logFileName, accessParam, shareParam, NULL, dispParam, attribParam, NULL);
-
-	if (hFile != INVALID_HANDLE_VALUE)
-	{
-		LARGE_INTEGER offset{};
-		offset.QuadPart = 0;
-		::SetFilePointerEx(hFile, offset, NULL, FILE_END);
-
-		SYSTEMTIME currentTime = {};
-		::GetLocalTime(&currentTime);
-		wstring dateTimeStrW = getDateTimeStrFrom(L"yyyy-MM-dd HH:mm:ss", currentTime);
-		string log2writeStr = wstring2string(dateTimeStrW, CP_UTF8);
-		log2writeStr += "  ";
-		log2writeStr += log2write;
-		log2writeStr += "\n";
-
-		DWORD bytes_written = 0;
-		::WriteFile(hFile, log2writeStr.c_str(), static_cast<DWORD>(log2writeStr.length()), &bytes_written, NULL);
-
-		::FlushFileBuffers(hFile);
-		::CloseHandle(hFile);
-	}
+	(void)logFileName;
+	(void)log2write;
+	// Privacy hardening: disable all file-based logging.
 }
 
 void writeLog(const wchar_t* logFileName, const wchar_t* log2write)

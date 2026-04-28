@@ -17,7 +17,6 @@
 #include "Notepad_plus.h"
 
 #include <shlwapi.h>
-#include <wininet.h>
 
 #include <ctime>
 #include <memory>

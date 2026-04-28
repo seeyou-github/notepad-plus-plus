@@ -2281,7 +2281,7 @@ intptr_t CALLBACK Editing2SubDlg::run_dlgProc(UINT message, WPARAM wParam, LPARA
 
 				case IDC_BUTTON_NPC_NOTE:
 				{
-					::ShellExecute(NULL, L"open", L"https://npp-user-manual.org/docs/views/#show-symbol", NULL, NULL, SW_SHOWNORMAL);
+					::MessageBox(_hSelf, L"Network access has been disabled by this build.", L"Network Disabled", MB_OK | MB_ICONINFORMATION);
 					return TRUE;
 				}
 

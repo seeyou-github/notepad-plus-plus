@@ -107,9 +107,6 @@ namespace NppDarkMode
 	void setToolbarFluentMonochrome(bool setMonochrome);
 	void setToolbarFluentCustomColor(COLORREF color, bool useDark);
 	void setToolbarFluentCustomColor(COLORREF color);
-	void setMenuFontSizes(int menuBarFontSize, int menuListFontSize);
-	int getMenuBarFontSize();
-	int getMenuListFontSize();
 	int getTabIconSet(bool useDark);
 	void setTabIconSet(bool useAltIcons, bool useDark);
 	bool useTabTheme();

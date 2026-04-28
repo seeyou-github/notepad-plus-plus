@@ -381,8 +381,6 @@ namespace NppDarkMode
 
 	static Options _options;			// actual runtime options
 	static ::AdvancedOptions g_advOptions;
-	static int g_menuBarFontSize = 0;
-	static int g_menuListFontSize = 0;
 
 	static Options configuredOptions()
 	{
@@ -392,8 +390,6 @@ namespace NppDarkMode
 		opt.enablePlugin = nppGui._darkmode._isEnabledPlugin;
 
 		g_colorToneChoice = nppGui._darkmode._colorTone;
-		g_menuBarFontSize = nppGui._menuBarFontSize;
-		g_menuListFontSize = nppGui._menuListFontSize;
 		tCustom.change(nppGui._darkmode._customColors);
 
 		return opt;
@@ -627,22 +623,6 @@ namespace NppDarkMode
 	void setToolbarFluentCustomColor(COLORREF color)
 	{
 		NppDarkMode::setToolbarFluentCustomColor(color, NppDarkMode::isEnabled());
-	}
-
-	void setMenuFontSizes(int menuBarFontSize, int menuListFontSize)
-	{
-		g_menuBarFontSize = menuBarFontSize < 0 ? 0 : menuBarFontSize;
-		g_menuListFontSize = menuListFontSize < 0 ? 0 : menuListFontSize;
-	}
-
-	int getMenuBarFontSize()
-	{
-		return g_menuBarFontSize;
-	}
-
-	int getMenuListFontSize()
-	{
-		return g_menuListFontSize;
 	}
 
 	void setTabIconSet(bool useAltIcons, bool useDark)
@@ -4099,37 +4079,7 @@ namespace NppDarkMode
 			}
 		}
 
-		HFONT hFont = nullptr;
-		if (g_menuBarFontSize > 0)
-		{
-			NONCLIENTMETRICS ncm{};
-			ncm.cbSize = sizeof(NONCLIENTMETRICS);
-			if (::SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0))
-			{
-				const int logPixelsY = ::GetDeviceCaps(UDMI.um.hdc, LOGPIXELSY);
-				ncm.lfMenuFont.lfHeight = -::MulDiv(g_menuBarFontSize, logPixelsY, 72);
-				hFont = ::CreateFontIndirect(&ncm.lfMenuFont);
-			}
-		}
-
-		HFONT hOldFont = nullptr;
-		if (hFont != nullptr)
-		{
-			hOldFont = static_cast<HFONT>(::SelectObject(UDMI.um.hdc, hFont));
-		}
-
-		::SetBkMode(UDMI.um.hdc, TRANSPARENT);
-		::SetTextColor(UDMI.um.hdc, dttopts.crText);
-		::DrawTextW(UDMI.um.hdc, buffer.c_str(), static_cast<int>(mii.cch), &UDMI.dis.rcItem, dwFlags);
-
-		if (hOldFont != nullptr)
-		{
-			::SelectObject(UDMI.um.hdc, hOldFont);
-		}
-		if (hFont != nullptr)
-		{
-			::DeleteObject(hFont);
-		}
+		::DrawThemeTextEx(hTheme, UDMI.um.hdc, MENU_BARITEM, iTextStateID, buffer.c_str(), static_cast<int>(mii.cch), dwFlags, &UDMI.dis.rcItem, &dttopts);
 	}
 
 	static void drawUAHMenuNCBottomLine(HWND hWnd)

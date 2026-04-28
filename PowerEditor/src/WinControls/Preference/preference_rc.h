@@ -79,12 +79,6 @@
 #define IDC_STATUSBAR_GB_STATIC                        6133
 #define IDC_CHECK_HIDESTATUSBAR                        6134
 #define IDC_CHECK_SHOWONLYPINNEDBUTTON                 6135
-#define IDC_MENUICONSIZE_STATIC                        6139
-#define IDC_MENUICONSIZE_SLIDER                        6140
-#define IDC_MENUBARFONTSIZE_STATIC                     6141
-#define IDC_MENUBARFONTSIZE_EDIT                       6142
-#define IDC_MENULISTFONTSIZE_STATIC                    6143
-#define IDC_MENULISTFONTSIZE_EDIT                      6144
 
 #define IDC_TABCOMPACTLABELLEN_STATIC                  6136
 #define IDC_EDIT_TABCOMPACTLABELLEN                    6137

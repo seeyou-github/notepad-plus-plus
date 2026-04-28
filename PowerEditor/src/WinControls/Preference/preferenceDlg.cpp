@@ -80,12 +80,6 @@ static constexpr int AUTOCOMPLETEFROMCHAR_SMALLEST = 1;
 static constexpr int AUTOCOMPLETEFROMCHAR_LARGEST = 9;
 static constexpr int AUTOCOMPLETEFROMCHAR_INTERVAL = 1;
 
-static constexpr int MENUICONSIZE_SMALLEST = 0;
-static constexpr int MENUICONSIZE_LARGEST = 4;
-static constexpr int MENUICONSIZE_INTERVAL = 1;
-static constexpr int MENUFONTSIZE_SMALLEST = 0;
-static constexpr int MENUFONTSIZE_LARGEST = 72;
-
 // This int encoding array is built from "EncodingUnit encodings[]" (see EncodingMapper.cpp)
 // And NewDocumentSubDlg will use "int encoding array" to get more info from "EncodingUnit encodings[]"
 static constexpr int encodings[]{
@@ -768,7 +762,7 @@ void ToolbarSubDlg::enableIconColorPicker(bool enable, bool useDark)
 	_pIconColorPicker->redraw();
 }
 
-intptr_t CALLBACK GeneralSubDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM lParam)
+intptr_t CALLBACK GeneralSubDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	NppParameters& nppParam = NppParameters::getInstance();
 	NppGUI& nppGUI = nppParam.getNppGUI();
@@ -784,12 +778,6 @@ intptr_t CALLBACK GeneralSubDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM
 			::SendDlgItemMessage(_hSelf, IDC_CHECK_HIDESTATUSBAR, BM_SETCHECK, !showStatus, 0);
 			::SendDlgItemMessage(_hSelf, IDC_CHECK_HIDEMENUBAR, BM_SETCHECK, !showMenu, 0);
 			::SendDlgItemMessage(_hSelf, IDC_CHECK_HIDERIGHTSHORTCUTSOFMENUBAR, BM_SETCHECK, hideRightShortcutsFromMenu, 0);
-			::SendMessage(::GetDlgItem(_hSelf, IDC_MENUICONSIZE_SLIDER), TBM_SETRANGEMIN, TRUE, MENUICONSIZE_SMALLEST);
-			::SendMessage(::GetDlgItem(_hSelf, IDC_MENUICONSIZE_SLIDER), TBM_SETRANGEMAX, TRUE, MENUICONSIZE_LARGEST);
-			::SendMessage(::GetDlgItem(_hSelf, IDC_MENUICONSIZE_SLIDER), TBM_SETPAGESIZE, 0, MENUICONSIZE_INTERVAL);
-			::SendMessage(::GetDlgItem(_hSelf, IDC_MENUICONSIZE_SLIDER), TBM_SETPOS, TRUE, nppGUI._menuIconSize);
-			::SetDlgItemInt(_hSelf, IDC_MENUBARFONTSIZE_EDIT, static_cast<UINT>(nppGUI._menuBarFontSize), FALSE);
-			::SetDlgItemInt(_hSelf, IDC_MENULISTFONTSIZE_EDIT, static_cast<UINT>(nppGUI._menuListFontSize), FALSE);
 
 			LocalizationSwitcher & localizationSwitcher = nppParam.getLocalizationSwitcher();
 
@@ -812,33 +800,6 @@ intptr_t CALLBACK GeneralSubDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM
 			return TRUE;
 		}
 
-		case WM_HSCROLL:
-		{
-			HWND hMenuIconSizeSlider = ::GetDlgItem(_hSelf, IDC_MENUICONSIZE_SLIDER);
-			if (reinterpret_cast<HWND>(lParam) == hMenuIconSizeSlider)
-			{
-				const int iconSize = static_cast<int>(::SendMessage(hMenuIconSizeSlider, TBM_GETPOS, 0, 0));
-				if (nppGUI._menuIconSize != iconSize)
-				{
-					nppGUI._menuIconSize = iconSize;
-
-					static constexpr UINT toolbarMsgs[] = {
-						NPPM_INTERNAL_TOOLBARREDUCE,
-						NPPM_INTERNAL_TOOLBARENLARGE,
-						NPPM_INTERNAL_TOOLBARREDUCESET2,
-						NPPM_INTERNAL_TOOLBARENLARGESET2,
-						NPPM_INTERNAL_TOOLBARSTANDARD
-					};
-
-					if (iconSize >= MENUICONSIZE_SMALLEST && iconSize <= MENUICONSIZE_LARGEST)
-					{
-						::SendMessage(::GetParent(_hParent), toolbarMsgs[iconSize], 0, 0);
-						NppDarkMode::setToolbarIconSet(iconSize, NppDarkMode::isEnabled());
-					}
-				}
-			}
-			return TRUE;
-		}
 
 		case WM_CTLCOLORLISTBOX:
 		{
@@ -944,30 +905,6 @@ intptr_t CALLBACK GeneralSubDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM
 						}
 						return TRUE;
 
-						case EN_CHANGE:
-						{
-							if (LOWORD(wParam) == IDC_MENUBARFONTSIZE_EDIT || LOWORD(wParam) == IDC_MENULISTFONTSIZE_EDIT)
-							{
-								auto readAndClamp = [this](int ctrlId, int oldVal) -> int
-								{
-									static constexpr int stringSize = 8;
-									wchar_t str[stringSize]{};
-									::GetDlgItemText(_hSelf, ctrlId, str, stringSize);
-									if (lstrcmp(str, L"") == 0)
-										return oldVal;
-									const int newVal = static_cast<int>(::GetDlgItemInt(_hSelf, ctrlId, nullptr, FALSE));
-									return std::clamp(newVal, MENUFONTSIZE_SMALLEST, MENUFONTSIZE_LARGEST);
-								};
-
-								nppGUI._menuBarFontSize = readAndClamp(IDC_MENUBARFONTSIZE_EDIT, nppGUI._menuBarFontSize);
-								nppGUI._menuListFontSize = readAndClamp(IDC_MENULISTFONTSIZE_EDIT, nppGUI._menuListFontSize);
-								NppDarkMode::setMenuFontSizes(nppGUI._menuBarFontSize, nppGUI._menuListFontSize);
-								::DrawMenuBar(::GetParent(_hParent));
-								::RedrawWindow(::GetParent(_hParent), nullptr, nullptr, RDW_INVALIDATE | RDW_FRAME | RDW_UPDATENOW);
-								return TRUE;
-							}
-							break;
-						}
 					}
 			}
 		}
@@ -1167,7 +1104,6 @@ intptr_t CALLBACK ToolbarSubDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM
 
 				case IDC_RADIO_SMALLICON:
 				{
-					nppGUI._menuIconSize = 0;
 					::SendMessage(::GetParent(_hParent), NPPM_INTERNAL_TOOLBARREDUCE, 0, 0);
 					NppDarkMode::setToolbarIconSet(0, NppDarkMode::isEnabled());
 					::SendMessage(_hSelf, NPPM_INTERNAL_CHANGETOOLBARCOLORABLESTATE, 0, 0);
@@ -1176,7 +1112,6 @@ intptr_t CALLBACK ToolbarSubDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM
 
 				case IDC_RADIO_BIGICON:
 				{
-					nppGUI._menuIconSize = 1;
 					::SendMessage(::GetParent(_hParent), NPPM_INTERNAL_TOOLBARENLARGE, 0, 0);
 					NppDarkMode::setToolbarIconSet(1, NppDarkMode::isEnabled());
 					::SendMessage(_hSelf, NPPM_INTERNAL_CHANGETOOLBARCOLORABLESTATE, 0, 0);
@@ -1185,7 +1120,6 @@ intptr_t CALLBACK ToolbarSubDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM
 
 				case IDC_RADIO_SMALLICON2:
 				{
-					nppGUI._menuIconSize = 2;
 					::SendMessage(::GetParent(_hParent), NPPM_INTERNAL_TOOLBARREDUCESET2, 0, 0);
 					NppDarkMode::setToolbarIconSet(2, NppDarkMode::isEnabled());
 					::SendMessage(_hSelf, NPPM_INTERNAL_CHANGETOOLBARCOLORABLESTATE, 0, 0);
@@ -1194,7 +1128,6 @@ intptr_t CALLBACK ToolbarSubDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM
 
 				case IDC_RADIO_BIGICON2:
 				{
-					nppGUI._menuIconSize = 3;
 					::SendMessage(::GetParent(_hParent), NPPM_INTERNAL_TOOLBARENLARGESET2, 0, 0);
 					NppDarkMode::setToolbarIconSet(3, NppDarkMode::isEnabled());
 					::SendMessage(_hSelf, NPPM_INTERNAL_CHANGETOOLBARCOLORABLESTATE, 0, 0);
@@ -1203,7 +1136,6 @@ intptr_t CALLBACK ToolbarSubDlg::run_dlgProc(UINT message, WPARAM wParam, LPARAM
 
 				case IDC_RADIO_STANDARD:
 				{
-					nppGUI._menuIconSize = 4;
 					::SendMessage(::GetParent(_hParent), NPPM_INTERNAL_TOOLBARSTANDARD, 0, 0);
 					NppDarkMode::setToolbarIconSet(4, NppDarkMode::isEnabled());
 					::SendMessage(_hSelf, NPPM_INTERNAL_CHANGETOOLBARCOLORABLESTATE, 0, 0);

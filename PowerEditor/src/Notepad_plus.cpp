@@ -3438,23 +3438,16 @@ bool isUrl(wchar_t * text, int textLen, int start, int* segmentLen)
 		if (len)
 		{
 			len += schemeLen;
-			URL_COMPONENTS url;
-			memset (& url, 0, sizeof(url));
-			url.dwStructSize = sizeof(url);
-			bool r  = InternetCrackUrl(& text [start], len, 0, & url);
-			if (r)
+			// Privacy/network-hardening build: avoid WinINet URL parsing dependency.
+			removeUnwantedTrailingCharFromEnclosedUrl(start, & text [0], & len);
+			while (removeUnwantedTrailingCharFromUrl (& text [start], & len));
+			if (len > schemeLen)
 			{
-				removeUnwantedTrailingCharFromEnclosedUrl(start, & text [0], & len);
-
-				while (removeUnwantedTrailingCharFromUrl (& text [start], & len));
 				*segmentLen = len;
 				return true;
 			}
-			else // to avoid potentially catastrophic backtracking, skip the entire text that looked like a URL
-			{
-				*segmentLen = len;
-				return false;
-			}
+			*segmentLen = len;
+			return false;
 		}
 		len = 1;
 		int lMax = textLen - start;

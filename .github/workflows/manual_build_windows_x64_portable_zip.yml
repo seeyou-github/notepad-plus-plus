@@ -59,8 +59,6 @@ jobs:
 
         Copy-Item -LiteralPath "$root\\src\\langs.model.xml" -Destination $dst -Force
         Copy-Item -LiteralPath "$root\\src\\stylers.model.xml" -Destination $dst -Force
-        Copy-Item -LiteralPath "$root\\src\\tabContextMenu_example.xml" -Destination $dst -Force
-        Copy-Item -LiteralPath "$root\\src\\toolbarButtonsConf_example.xml" -Destination $dst -Force
         Copy-Item -LiteralPath "$root\\bin64\\notepad++.exe" -Destination $dst -Force
 
         Copy-IfExists -Source "$root\\bin64\\plugins\\NppExport\\NppExport.dll" -Destination "$dst\\plugins\\NppExport\\"
